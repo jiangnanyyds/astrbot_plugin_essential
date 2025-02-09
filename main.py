@@ -52,7 +52,7 @@ async def get_search_anime(self, message: AstrMessageEvent, context: Context):
                 # 如果有视频预览，则发送视频消息
                 if "video" in res and res["video"]:
                     yield Video.fromURL(res["video"])
-            return CommandResult().use_t2i(False)
+            yield CommandResult().use_t2i(False)  # 使用 yield 代替 return
         else:
             yield CommandResult().error("没有找到番剧")
     except Exception as e:
