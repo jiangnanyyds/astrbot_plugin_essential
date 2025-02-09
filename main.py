@@ -1,6 +1,6 @@
 import aiohttp
 import urllib.parse
-from astrbot.api.all import AstrMessageEvent, CommandResult, Context, Image, Plain
+from astrbot.api.all import AstrMessageEvent, CommandResult, Context, Image, Plain, Video
 
 class Main:
     def __init__(self, context: Context) -> None:
@@ -66,6 +66,10 @@ class Main:
                     )
                     chain_list.append(Plain(text))
                     chain_list.append(Image.fromURL(res["image"]))
+                    # 如果有视频预览，则加入媒体预览消息
+                    if "video" in res and res["video"]:
+                        chain_list.append(Plain("媒体预览:"))
+                        chain_list.append(Video.fromURL(res["video"]))
                 return CommandResult(chain=chain_list, use_t2i_=False)
             else:
                 return CommandResult().error("没有找到番剧")
