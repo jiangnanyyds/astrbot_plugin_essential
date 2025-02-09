@@ -47,16 +47,13 @@ class Main:
                 return CommandResult().error(data["error"])
 
             if data.get("result") and len(data["result"]) > 0:
-                chain_list = []
-                # 遍历所有匹配结果
+                # 发送文本描述
                 for res in data["result"]:
-                    # 将秒数转换为分秒格式
                     res["from"] = self.time_convert(res["from"])
                     res["to"] = self.time_convert(res["to"])
                     warn = ""
                     if float(res["similarity"]) < 0.8:
                         warn = "相似度较低，可能不是同一番剧。\n"
-                    # 拼接文本信息
                     text = (
                         f"{warn}番名: {res['anilist']['title']['native']}\n"
                         f"相似度: {res['similarity']}\n"
@@ -64,13 +61,12 @@ class Main:
                         f"时间: {res['from']} - {res['to']}\n"
                         "精准空降截图:"
                     )
-                    chain_list.append(Plain(text))
-                    chain_list.append(Image.fromURL(res["image"]))
-                    # 如果有视频预览，则加入媒体预览消息
+                    yield Plain(text)
+                    yield Image.fromURL(res["image"])
+                    # 如果有视频预览，则发送视频消息
                     if "video" in res and res["video"]:
-                        chain_list.append(Plain("媒体预览:"))
-                        chain_list.append(Video.fromURL(res["video"]))
-                return CommandResult(chain=chain_list, use_t2i_=False)
+                        yield Video.fromURL(res["video"])
+                return CommandResult().use_t2i(False)
             else:
                 return CommandResult().error("没有找到番剧")
         except Exception as e:
